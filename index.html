@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday Cutie</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;500&display=swap" rel="stylesheet">
+
+<style>
+body{
+margin:0;
+background: radial-gradient(circle at top,#1b0f2e,#090012 70%);
+color:white;
+overflow:hidden;
+font-family:'Poppins',sans-serif;
+}
+
+/* Loading Screen */
+#loading{
+position:fixed;
+inset:0;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+background:linear-gradient(135deg,#ff6ec7,#ff9a9e);
+z-index:9999;
+}
+
+#countdown{
+font-size:50px;
+font-weight:bold;
+background:rgba(255,255,255,.25);
+padding:15px 30px;
+border-radius:20px;
+}
+
+/* Main Title */
+h1.title{
+font-family:'Great Vibes',cursive;
+font-size:70px;
+text-align:center;
+margin-top:80px;
+text-shadow:0 0 20px #ffb6ff;
+display:none;
+}
+
+/* Fireworks canvas */
+canvas{
+position:fixed;
+top:0;
+left:0;
+}
+
+/* Polaroid */
+.polaroid{
+position:absolute;
+width:220px;
+background:white;
+padding:10px 10px 20px;
+border-radius:8px;
+box-shadow:0 15px 40px rgba(0,0,0,.5);
+opacity:0;
+animation:fadein 1s forwards;
+}
+
+.polaroid img, .polaroid video{
+width:100%;
+height:170px;
+object-fit:contain;
+background:black;
+border-radius:4px;
+}
+
+@keyframes fadein{
+from{opacity:0; transform:scale(.7) rotate(-10deg);}
+to{opacity:1; transform:scale(1) rotate(3deg);}
+}
+
+/* Letter */
+#letter{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.7);
+display:none;
+justify-content:center;
+align-items:center;
+}
+
+#card{
+background:#fff;
+color:#333;
+max-width:600px;
+padding:30px;
+border-radius:20px;
+line-height:1.7;
+}
+
+button{
+margin-top:15px;
+padding:10px 18px;
+border:none;
+background:#ff4fa3;
+color:white;
+border-radius:12px;
+cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div id="loading">
+<h2>Counting moments for you ❤️</h2>
+<div id="countdown">00:00:00</div>
+</div>
+
+<canvas id="fireworks"></canvas>
+
+<h1 class="title" id="mainTitle">
+🎉 Happy Birthday Cutie 🎉
+</h1>
+
+<div id="letter">
+<div id="card">
+<p>Hey…</p>
+<p>I know I don’t always say things perfectly because I’m a little shy… but you are honestly one of the most special parts of my life.</p>
+<p>You make my normal days feel important and my bad days feel easier. Even small moments with you stay in my head for a long time.</p>
+<p>I don’t need big reasons to like you… I just like you the way you are — your smile, your moods, your silence, everything.</p>
+<p>I just hope I can always be someone who makes you smile.</p>
+<p>Happy Birthday 💗</p>
+<p><b>— Yours, Oldiee</b></p>
+<button onclick="document.getElementById('letter').style.display='none'">Close</button>
+</div>
+</div>
+
+<script>
+let birthday=new Date("2026-02-19T00:00:00+05:30");
+const loading=document.getElementById("loading");
+const title=document.getElementById("mainTitle");
+
+/* START FUNCTION */
+function start(){
+loading.style.display="none";
+title.style.display="block";
+launchFireworks();
+startPhotos();
+document.body.addEventListener("click",()=>{
+document.getElementById("letter").style.display="flex";
+},{once:true});
+}
+
+/* If opened after midnight → skip countdown */
+if(new Date()>=birthday){
+start();
+}else{
+const cd=document.getElementById("countdown");
+setInterval(()=>{
+let diff=birthday-new Date();
+if(diff<=0){start();return;}
+let h=Math.floor(diff/1000/60/60);
+let m=Math.floor((diff/1000/60)%60);
+let s=Math.floor((diff/1000)%60);
+cd.textContent=
+String(h).padStart(2,"0")+":"+
+String(m).padStart(2,"0")+":"+
+String(s).padStart(2,"0");
+},1000);
+}
+
+/* FIREWORKS */
+const canvas=document.getElementById("fireworks");
+const ctx=canvas.getContext("2d");
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+
+let particles=[];
+function firework(){
+let x=Math.random()*canvas.width;
+let y=Math.random()*canvas.height/2;
+for(let i=0;i<70;i++){
+particles.push({
+x,y,
+dx:(Math.random()-.5)*6,
+dy:(Math.random()-.5)*6,
+life:100
+});
+}
+}
+setInterval(firework,700);
+
+function launchFireworks(){
+(function animate(){
+ctx.fillStyle="rgba(0,0,0,.25)";
+ctx.fillRect(0,0,canvas.width,canvas.height);
+particles.forEach((p,i)=>{
+p.x+=p.dx;
+p.y+=p.dy;
+p.life--;
+ctx.fillStyle="hsl("+Math.random()*360+",100%,70%)";
+ctx.fillRect(p.x,p.y,2,2);
+if(p.life<=0)particles.splice(i,1);
+});
+requestAnimationFrame(animate);
+})();
+}
+
+/* PHOTOS */
+const files=[
+"photos/1.jpg","photos/2.jpg","photos/3.jpg","photos/4.jpg",
+"photos/5.jpg","photos/6.jpg","photos/7.jpg","photos/8.jpg",
+"photos/9.jpg","photos/10.jpg"
+];
+
+function startPhotos(){
+setInterval(()=>{
+let src=files[Math.floor(Math.random()*files.length)];
+let div=document.createElement("div");
+div.className="polaroid";
+
+let media;
+if(src.endsWith(".mp4")){
+media=document.createElement("video");
+media.src=src;
+media.autoplay=true;
+media.loop=true;
+media.muted=true;
+}else{
+media=document.createElement("img");
+media.src=src;
+}
+
+div.appendChild(media);
+div.style.left=Math.random()*(window.innerWidth-240)+"px";
+div.style.top=Math.random()*(window.innerHeight-260)+"px";
+
+document.body.appendChild(div);
+setTimeout(()=>div.remove(),18000);
+},2500);
+}
+</script>
+
+</body>
+</html>
