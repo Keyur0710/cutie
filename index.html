@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -16,7 +17,7 @@ overflow:hidden;
 font-family:'Poppins',sans-serif;
 }
 
-/* Loading Screen */
+/* Loading */
 #loading{
 position:fixed;
 inset:0;
@@ -36,21 +37,25 @@ padding:15px 30px;
 border-radius:20px;
 }
 
-/* Main Title */
-h1.title{
+/* Title */
+#mainTitle{
+display:none;
+position:fixed;
+top:40px;
+left:50%;
+transform:translateX(-50%);
 font-family:'Great Vibes',cursive;
 font-size:70px;
-text-align:center;
-margin-top:80px;
-text-shadow:0 0 20px #ffb6ff;
-display:none;
+text-shadow:0 0 25px #ffb6ff;
+z-index:5;
 }
 
-/* Fireworks canvas */
+/* Fireworks */
 canvas{
 position:fixed;
 top:0;
 left:0;
+z-index:0;
 }
 
 /* Polaroid */
@@ -61,21 +66,15 @@ background:white;
 padding:10px 10px 20px;
 border-radius:8px;
 box-shadow:0 15px 40px rgba(0,0,0,.5);
-opacity:0;
-animation:fadein 1s forwards;
+z-index:3;
 }
 
-.polaroid img, .polaroid video{
+.polaroid img,.polaroid video{
 width:100%;
 height:170px;
 object-fit:contain;
 background:black;
 border-radius:4px;
-}
-
-@keyframes fadein{
-from{opacity:0; transform:scale(.7) rotate(-10deg);}
-to{opacity:1; transform:scale(1) rotate(3deg);}
 }
 
 /* Letter */
@@ -89,7 +88,6 @@ align-items:center;
 z-index:9999;
 }
 
-
 #card{
 background:#fff;
 color:#333;
@@ -98,39 +96,27 @@ padding:30px;
 border-radius:20px;
 line-height:1.7;
 }
-
-button{
-margin-top:15px;
-padding:10px 18px;
-border:none;
-background:#ff4fa3;
-color:white;
-border-radius:12px;
-cursor:pointer;
-}
 </style>
+
 </head>
 
 <body>
 
 <div id="loading">
 <h2>Counting moments for you ❤️</h2>
-<div id="countdown">00:00:00</div>
+<div id="countdown">00:00:10</div>
 </div>
 
 <canvas id="fireworks"></canvas>
 
-<h1 class="title" id="mainTitle">
-🎉 Happy Birthday Cutie 🎉
-</h1>
+<h1 id="mainTitle">🎉 Happy Birthday Cutie 🎉</h1>
 
 <div id="letter">
 <div id="card">
 <p>Hey…</p>
-<p>I know I don’t always say things perfectly because I’m a little shy… but you are honestly one of the most special parts of my life.</p>
-<p>You make my normal days feel important and my bad days feel easier. Even small moments with you stay in my head for a long time.</p>
-<p>I don’t need big reasons to like you… I just like you the way you are — your smile, your moods, your silence, everything.</p>
-<p>I just hope I can always be someone who makes you smile.</p>
+<p>I know I’m shy with words, but you really mean a lot to me.</p>
+<p>You make my simple days special and my bad days easier.</p>
+<p>I like you exactly the way you are.</p>
 <p>Happy Birthday 💗</p>
 <p><b>— Yours, Oldiee</b></p>
 <button onclick="document.getElementById('letter').style.display='none'">Close</button>
@@ -138,102 +124,76 @@ cursor:pointer;
 </div>
 
 <script>
-let paused = false;
-let slideshowTimer = null;
-let currentMemory = null;
 
-/* ---------------- BIRTHDAY TIME ---------------- */
-let birthday = new Date();
-birthday.setSeconds(birthday.getSeconds() + 10);
- // test 10 seconds
+/* ---------- TIME ---------- */
+let birthday=new Date();
+birthday.setSeconds(birthday.getSeconds()+10); // test mode
 
+/* ---------- COUNTDOWN ---------- */
+const cd=document.getElementById("countdown");
 const loading=document.getElementById("loading");
 const title=document.getElementById("mainTitle");
 
-/* ---------------- START EXPERIENCE ---------------- */
-function start(){
-loading.style.display="none";
+function countdown(){
+let diff=birthday-new Date();
 
-/* show title */
-title.style.display="block";
-title.style.position="fixed";
-title.style.top="40px";
-title.style.left="50%";
-title.style.transform="translateX(-50%)";
-title.style.zIndex="5";
-
-launchFireworks();
-startPhotos();
-
-/* open letter on tap */
-document.body.addEventListener("click",()=>{
-paused = true;
-clearTimeout(slideshowTimer);
-document.getElementById("letter").style.display="flex";
-},{once:true});
-
-
-
-/* countdown */
-/* ---------------- COUNTDOWN CLOCK ---------------- */
-/* ---------------- WORKING COUNTDOWN ---------------- */
-
-const cd = document.getElementById("countdown");
-let started = false;
-
-function updateCountdown(){
-
-if(started) return;
-
-let now = new Date().getTime();
-let diff = birthday.getTime() - now;
-
-if(diff <= 0){
-started = true;
-start();
+if(diff<=0){
+startExperience();
 return;
 }
 
-let seconds = Math.floor((diff/1000)%60);
-let minutes = Math.floor((diff/1000/60)%60);
-let hours = Math.floor((diff/1000/60/60)%24);
+let s=Math.floor((diff/1000)%60);
+let m=Math.floor((diff/1000/60)%60);
+let h=Math.floor((diff/1000/60/60)%24);
 
-cd.textContent =
-String(hours).padStart(2,"0")+":"+
-String(minutes).padStart(2,"0")+":"+
-String(seconds).padStart(2,"0");
+cd.textContent=
+String(h).padStart(2,"0")+":"+
+String(m).padStart(2,"0")+":"+
+String(s).padStart(2,"0");
+}
+setInterval(countdown,1000);
+countdown();
+
+/* ---------- START ---------- */
+let paused=false;
+let current=null;
+
+function startExperience(){
+loading.style.display="none";
+title.style.display="block";
+launchFireworks();
+startMemories();
+
+document.body.addEventListener("click",()=>{
+paused=true;
+document.getElementById("letter").style.display="flex";
+},{once:true});
 }
 
-setInterval(updateCountdown,1000);
-updateCountdown();
-
-
-
-/* ---------------- FIREWORKS ---------------- */
+/* ---------- FIREWORKS ---------- */
 const canvas=document.getElementById("fireworks");
 const ctx=canvas.getContext("2d");
-canvas.width=window.innerWidth;
-canvas.height=window.innerHeight;
+canvas.width=innerWidth;
+canvas.height=innerHeight;
 
 let particles=[];
-function firework(){
-let x=Math.random()*canvas.width;
-let y=Math.random()*canvas.height/2;
+setInterval(()=>{
 for(let i=0;i<70;i++){
 particles.push({
-x,y,
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height/2,
 dx:(Math.random()-.5)*6,
 dy:(Math.random()-.5)*6,
 life:100
 });
 }
-}
-setInterval(firework,700);
+},700);
 
 function launchFireworks(){
 (function animate(){
 ctx.fillStyle="rgba(0,0,0,.25)";
 ctx.fillRect(0,0,canvas.width,canvas.height);
+
 particles.forEach((p,i)=>{
 p.x+=p.dx;
 p.y+=p.dy;
@@ -242,51 +202,41 @@ ctx.fillStyle="hsl("+Math.random()*360+",100%,70%)";
 ctx.fillRect(p.x,p.y,2,2);
 if(p.life<=0)particles.splice(i,1);
 });
+
 requestAnimationFrame(animate);
 })();
 }
 
-/* ---------------- MEMORY FILES ---------------- */
+/* ---------- FILES ---------- */
 const files=[
 "photos/1.jpg","photos/2.jpg","photos/3.jpg","photos/4.jpg","photos/5.jpg",
 "photos/6.jpg","photos/7.jpg","photos/8.jpg","photos/9.jpg","photos/10.jpg",
-"photos/11.jpg",
-"photos/12.mp4","photos/13.mp4","photos/14.mp4","photos/15.mp4","photos/16.mp4"
+"photos/11.jpg","photos/12.mp4","photos/13.mp4","photos/14.mp4","photos/15.mp4","photos/16.mp4"
 ];
 
-/* ---------------- ONE-BY-ONE MEMORY SHOW ---------------- */
-function startPhotos(){
+/* ---------- MEMORIES ---------- */
+function startMemories(){
 
-let queue = [...files];
-queue.sort(()=>Math.random()-0.5); // shuffle once
-let index = 0;
+let queue=[...files];
+queue.sort(()=>Math.random()-0.5);
+let i=0;
 
-function showNext(){
+function next(){
 
 if(paused) return;
+if(i>=queue.length) return;
 
-if(index >= queue.length) return;
+if(current) current.remove();
 
-let src = queue[index];
-index++;
-
-/* remove previous memory first */
-if(currentMemory){
-currentMemory.remove();
-currentMemory = null;
-}
-
+let src=queue[i++];
 let div=document.createElement("div");
 div.className="polaroid";
-div.style.zIndex="3";
 
 let media;
-
 if(src.endsWith(".mp4")){
 media=document.createElement("video");
 media.src=src;
 media.autoplay=true;
-media.loop=false;
 media.muted=true;
 media.playsInline=true;
 }else{
@@ -296,50 +246,18 @@ media.src=src;
 
 div.appendChild(media);
 
-/* side positioning */
-let margin=260;
-let side=Math.floor(Math.random()*4);
-
-if(side==0){
-div.style.top="20px";
-div.style.left=Math.random()*(window.innerWidth-margin)+"px";
-}
-else if(side==1){
-div.style.top=(window.innerHeight-260)+"px";
-div.style.left=Math.random()*(window.innerWidth-margin)+"px";
-}
-else if(side==2){
-div.style.left="20px";
-div.style.top=Math.random()*(window.innerHeight-margin)+"px";
-}
-else{
-div.style.left=(window.innerWidth-240)+"px";
-div.style.top=Math.random()*(window.innerHeight-margin)+"px";
-}
+div.style.left=Math.random()*(window.innerWidth-240)+"px";
+div.style.top=Math.random()*(window.innerHeight-260)+"px";
 
 document.body.appendChild(div);
-currentMemory = div;
+current=div;
 
-/* schedule next memory */
-slideshowTimer = setTimeout(showNext,7000);
+setTimeout(next,7000);
 }
-
-showNext();
+next();
 }
-
-/* ---------------- LETTER ALWAYS ON TOP ---------------- */
-document.getElementById("letter").style.zIndex="10";
 
 </script>
 
-
 </body>
 </html>
-
-
-
-
-
-
-
-
