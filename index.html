@@ -143,7 +143,9 @@ let slideshowTimer = null;
 let currentMemory = null;
 
 /* ---------------- BIRTHDAY TIME ---------------- */
-let birthday = new Date(Date.now() + 10000); // test 10 seconds
+let birthday = new Date();
+birthday.setSeconds(birthday.getSeconds() + 10);
+ // test 10 seconds
 
 const loading=document.getElementById("loading");
 const title=document.getElementById("mainTitle");
@@ -174,22 +176,29 @@ document.getElementById("letter").style.display="flex";
 
 /* countdown */
 /* ---------------- COUNTDOWN CLOCK ---------------- */
-const cd=document.getElementById("countdown");
+/* ---------------- WORKING COUNTDOWN ---------------- */
+
+const cd = document.getElementById("countdown");
+let started = false;
 
 function updateCountdown(){
-let now=new Date().getTime();
-let diff=birthday-now;
 
-if(diff<=0){
+if(started) return;
+
+let now = new Date().getTime();
+let diff = birthday.getTime() - now;
+
+if(diff <= 0){
+started = true;
 start();
 return;
 }
 
-let hours=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
-let minutes=Math.floor((diff%(1000*60*60))/(1000*60));
-let seconds=Math.floor((diff%(1000*60))/(1000));
+let seconds = Math.floor((diff/1000)%60);
+let minutes = Math.floor((diff/1000/60)%60);
+let hours = Math.floor((diff/1000/60/60)%24);
 
-cd.textContent=
+cd.textContent =
 String(hours).padStart(2,"0")+":"+
 String(minutes).padStart(2,"0")+":"+
 String(seconds).padStart(2,"0");
@@ -197,6 +206,7 @@ String(seconds).padStart(2,"0");
 
 setInterval(updateCountdown,1000);
 updateCountdown();
+
 
 
 /* ---------------- FIREWORKS ---------------- */
@@ -325,6 +335,7 @@ document.getElementById("letter").style.zIndex="10";
 
 </body>
 </html>
+
 
 
 
