@@ -17,7 +17,7 @@ overflow:hidden;
 font-family:'Poppins',sans-serif;
 }
 
-/* Loading */
+/* Loading Screen */
 #loading{
 position:fixed;
 inset:0;
@@ -50,6 +50,24 @@ text-shadow:0 0 25px #ffb6ff;
 z-index:5;
 }
 
+/* Open Letter Button */
+#openLetterBtn{
+position:fixed;
+top:140px;
+left:50%;
+transform:translateX(-50%);
+padding:14px 26px;
+font-size:18px;
+border:none;
+border-radius:25px;
+background:linear-gradient(45deg,#ff4fa3,#ff85c8);
+color:white;
+cursor:pointer;
+z-index:6;
+display:none;
+box-shadow:0 0 20px rgba(255,100,170,.7);
+}
+
 /* Fireworks */
 canvas{
 position:fixed;
@@ -58,7 +76,6 @@ left:0;
 z-index:0;
 pointer-events:none;
 }
-
 
 /* Polaroid */
 .polaroid{
@@ -70,7 +87,6 @@ border-radius:8px;
 box-shadow:0 15px 40px rgba(0,0,0,.5);
 z-index:3;
 }
-
 .polaroid img,.polaroid video{
 width:100%;
 height:170px;
@@ -100,7 +116,6 @@ line-height:1.7;
 position:relative;
 z-index:10000;
 }
-
 </style>
 
 </head>
@@ -114,8 +129,11 @@ z-index:10000;
 
 <canvas id="fireworks"></canvas>
 
-<h1 id="mainTitle">Happy Birthday Cutie ❤️</h1>
+<h1 id="mainTitle">🎉 Happy Birthday Cutie 🎉</h1>
+<button id="openLetterBtn">Open My Letter 💌</button>
 
+<div id="letter">
+<div id="card">
 <h2 style="text-align:center;">HAPPIEST BIRTHDAY SHIFA ❤️</h2>
 
 <p>On Feb 19, 2007 the earth got gifted a very special person… and it's you.</p>
@@ -139,55 +157,50 @@ I LOVE YOU EVER AND FOREVER ❤️
 
 <button onclick="document.getElementById('letter').style.display='none'">Close</button>
 
+</div>
+</div>
 
 <script>
 
-/* ---------- TIME ---------- */
+/* TIME (test 10 sec) */
 let birthday=new Date();
-birthday.setSeconds(birthday.getSeconds()+10); // test mode
+birthday.setSeconds(birthday.getSeconds()+10);
 
-/* ---------- COUNTDOWN ---------- */
+/* COUNTDOWN */
 const cd=document.getElementById("countdown");
-const loading=document.getElementById("loading");
-const title=document.getElementById("mainTitle");
-
-function countdown(){
+function updateCountdown(){
 let diff=birthday-new Date();
-
-if(diff<=0){
-startExperience();
-return;
-}
-
+if(diff<=0){startExperience();return;}
 let s=Math.floor((diff/1000)%60);
 let m=Math.floor((diff/1000/60)%60);
 let h=Math.floor((diff/1000/60/60)%24);
-
 cd.textContent=
 String(h).padStart(2,"0")+":"+
 String(m).padStart(2,"0")+":"+
 String(s).padStart(2,"0");
 }
-setInterval(countdown,1000);
-countdown();
+setInterval(updateCountdown,1000);
+updateCountdown();
 
-/* ---------- START ---------- */
+/* START */
 let paused=false;
 let current=null;
 
 function startExperience(){
-loading.style.display="none";
-title.style.display="block";
+document.getElementById("loading").style.display="none";
+document.getElementById("mainTitle").style.display="block";
+document.getElementById("openLetterBtn").style.display="block";
 launchFireworks();
 startMemories();
-
-document.body.addEventListener("click",()=>{
-paused=true;
-document.getElementById("letter").style.display="flex";
-},{once:true});
 }
 
-/* ---------- FIREWORKS ---------- */
+/* Button opens letter */
+document.getElementById("openLetterBtn").onclick=function(){
+paused=true;
+document.getElementById("letter").style.display="flex";
+};
+
+/* FIREWORKS */
 const canvas=document.getElementById("fireworks");
 const ctx=canvas.getContext("2d");
 canvas.width=innerWidth;
@@ -210,7 +223,6 @@ function launchFireworks(){
 (function animate(){
 ctx.fillStyle="rgba(0,0,0,.25)";
 ctx.fillRect(0,0,canvas.width,canvas.height);
-
 particles.forEach((p,i)=>{
 p.x+=p.dx;
 p.y+=p.dy;
@@ -219,30 +231,25 @@ ctx.fillStyle="hsl("+Math.random()*360+",100%,70%)";
 ctx.fillRect(p.x,p.y,2,2);
 if(p.life<=0)particles.splice(i,1);
 });
-
 requestAnimationFrame(animate);
 })();
 }
 
-/* ---------- FILES ---------- */
+/* FILES */
 const files=[
 "photos/1.jpg","photos/2.jpg","photos/3.jpg","photos/4.jpg","photos/5.jpg",
 "photos/6.jpg","photos/7.jpg","photos/8.jpg","photos/9.jpg","photos/10.jpg",
 "photos/11.jpg","photos/12.mp4","photos/13.mp4","photos/14.mp4","photos/15.mp4","photos/16.mp4"
 ];
 
-/* ---------- MEMORIES ---------- */
+/* MEMORIES */
 function startMemories(){
-
 let queue=[...files];
 queue.sort(()=>Math.random()-0.5);
 let i=0;
 
 function next(){
-
-if(paused) return;
-if(i>=queue.length) return;
-
+if(paused||i>=queue.length) return;
 if(current) current.remove();
 
 let src=queue[i++];
@@ -262,7 +269,6 @@ media.src=src;
 }
 
 div.appendChild(media);
-
 div.style.left=Math.random()*(window.innerWidth-240)+"px";
 div.style.top=Math.random()*(window.innerHeight-260)+"px";
 
@@ -278,5 +284,3 @@ next();
 
 </body>
 </html>
-
-
