@@ -86,7 +86,9 @@ background:rgba(0,0,0,.7);
 display:none;
 justify-content:center;
 align-items:center;
+z-index:9999;
 }
+
 
 #card{
 background:#fff;
@@ -136,6 +138,9 @@ cursor:pointer;
 </div>
 
 <script>
+let paused = false;
+let slideshowTimer = null;
+let currentMemory = null;
 
 /* ---------------- BIRTHDAY TIME ---------------- */
 let birthday = new Date(Date.now() + 10000); // test 10 seconds
@@ -160,9 +165,11 @@ startPhotos();
 
 /* open letter on tap */
 document.body.addEventListener("click",()=>{
-paused = true;   // STOP memories
+paused = true;
+clearTimeout(slideshowTimer);
 document.getElementById("letter").style.display="flex";
 },{once:true});
+
 
 
 /* countdown */
@@ -240,19 +247,24 @@ const files=[
 /* ---------------- ONE-BY-ONE MEMORY SHOW ---------------- */
 function startPhotos(){
 
-let paused = false;
-let queue=[...files];           // copy
+let queue = [...files];
 queue.sort(()=>Math.random()-0.5); // shuffle once
-
-let index=0;
+let index = 0;
 
 function showNext(){
 
 if(paused) return;
-if(index>=queue.length) return; // stop after all shown
 
-let src=queue[index];
+if(index >= queue.length) return;
+
+let src = queue[index];
 index++;
+
+/* remove previous memory first */
+if(currentMemory){
+currentMemory.remove();
+currentMemory = null;
+}
 
 let div=document.createElement("div");
 div.className="polaroid";
@@ -274,7 +286,7 @@ media.src=src;
 
 div.appendChild(media);
 
-/* side placement */
+/* side positioning */
 let margin=260;
 let side=Math.floor(Math.random()*4);
 
@@ -296,13 +308,10 @@ div.style.top=Math.random()*(window.innerHeight-margin)+"px";
 }
 
 document.body.appendChild(div);
+currentMemory = div;
 
-/* remove after 7 sec then next */
-setTimeout(()=>{
-div.remove();
-showNext();
-},7000);
-
+/* schedule next memory */
+slideshowTimer = setTimeout(showNext,7000);
 }
 
 showNext();
@@ -316,6 +325,7 @@ document.getElementById("letter").style.zIndex="10";
 
 </body>
 </html>
+
 
 
 
