@@ -136,25 +136,24 @@ cursor:pointer;
 </div>
 
 <script>
-let birthday = new Date(Date.now() + 10000);
+
+/* ---------------- BIRTHDAY TIME ---------------- */
+let birthday = new Date(Date.now() + 10000); // test 10 seconds
+
 const loading=document.getElementById("loading");
 const title=document.getElementById("mainTitle");
 
-/* START FUNCTION */
+/* ---------------- START EXPERIENCE ---------------- */
 function start(){
 loading.style.display="none";
 
-/* show title forcefully */
-const t = document.getElementById("mainTitle");
-t.style.display="block";
-t.style.opacity="1";
-t.style.visibility="visible";
-
-/* center it */
-t.style.position="fixed";
-t.style.top="50px";
-t.style.left="50%";
-t.style.transform="translateX(-50%)";
+/* show title */
+title.style.display="block";
+title.style.position="fixed";
+title.style.top="40px";
+title.style.left="50%";
+title.style.transform="translateX(-50%)";
+title.style.zIndex="5";
 
 launchFireworks();
 startPhotos();
@@ -165,8 +164,7 @@ document.getElementById("letter").style.display="flex";
 },{once:true});
 }
 
-
-/* If opened after midnight → skip countdown */
+/* countdown */
 if(new Date()>=birthday){
 start();
 }else{
@@ -174,17 +172,12 @@ const cd=document.getElementById("countdown");
 setInterval(()=>{
 let diff=birthday-new Date();
 if(diff<=0){start();return;}
-let h=Math.floor(diff/1000/60/60);
-let m=Math.floor((diff/1000/60)%60);
 let s=Math.floor((diff/1000)%60);
-cd.textContent=
-String(h).padStart(2,"0")+":"+
-String(m).padStart(2,"0")+":"+
-String(s).padStart(2,"0");
+cd.textContent="00:00:"+String(s).padStart(2,"0");
 },1000);
 }
 
-/* FIREWORKS */
+/* ---------------- FIREWORKS ---------------- */
 const canvas=document.getElementById("fireworks");
 const ctx=canvas.getContext("2d");
 canvas.width=window.innerWidth;
@@ -221,36 +214,32 @@ requestAnimationFrame(animate);
 })();
 }
 
-/* PHOTOS */
+/* ---------------- MEMORY FILES ---------------- */
 const files=[
 "photos/1.jpg","photos/2.jpg","photos/3.jpg","photos/4.jpg","photos/5.jpg",
 "photos/6.jpg","photos/7.jpg","photos/8.jpg","photos/9.jpg","photos/10.jpg",
 "photos/11.jpg",
 "photos/12.mp4","photos/13.mp4","photos/14.mp4","photos/15.mp4","photos/16.mp4"
-];;
+];
 
+/* ---------------- ONE-BY-ONE MEMORY SHOW ---------------- */
 function startPhotos(){
 
-/* make a copy so originals stay safe */
-let memoryQueue = [...files];
+let queue=[...files];           // copy
+queue.sort(()=>Math.random()-0.5); // shuffle once
 
-/* shuffle memories once */
-memoryQueue.sort(()=>Math.random()-0.5);
+let index=0;
 
-let i = 0;
+function showNext(){
 
-let show = setInterval(()=>{
+if(index>=queue.length) return; // stop after all shown
 
-if(i >= memoryQueue.length){
-clearInterval(show); // stop after all memories shown
-return;
-}
-
-let src = memoryQueue[i];
-i++;
+let src=queue[index];
+index++;
 
 let div=document.createElement("div");
 div.className="polaroid";
+div.style.zIndex="3";
 
 let media;
 
@@ -268,60 +257,49 @@ media.src=src;
 
 div.appendChild(media);
 
-/* random side positions */
-let margin = 260;
-let side = Math.floor(Math.random()*4);
+/* side placement */
+let margin=260;
+let side=Math.floor(Math.random()*4);
 
-if(side==0){ // top
+if(side==0){
 div.style.top="20px";
 div.style.left=Math.random()*(window.innerWidth-margin)+"px";
 }
-else if(side==1){ // bottom
+else if(side==1){
 div.style.top=(window.innerHeight-260)+"px";
 div.style.left=Math.random()*(window.innerWidth-margin)+"px";
 }
-else if(side==2){ // left
+else if(side==2){
 div.style.left="20px";
 div.style.top=Math.random()*(window.innerHeight-margin)+"px";
 }
-else{ // right
+else{
 div.style.left=(window.innerWidth-240)+"px";
 div.style.top=Math.random()*(window.innerHeight-margin)+"px";
 }
 
 document.body.appendChild(div);
 
-/* remove after some time */
-setTimeout(()=>div.remove(),20000);
+/* remove after 7 sec then next */
+setTimeout(()=>{
+div.remove();
+showNext();
+},7000);
 
-},3500);
 }
 
-
-let media;
-if(src.endsWith(".mp4")){
-media=document.createElement("video");
-media.src=src;
-media.autoplay=true;
-media.loop=true;
-media.muted=true;
-}else{
-media=document.createElement("img");
-media.src=src;
+showNext();
 }
 
-div.appendChild(media);
-div.style.left=Math.random()*(window.innerWidth-240)+"px";
-div.style.top=Math.random()*(window.innerHeight-260)+"px";
+/* ---------------- LETTER ALWAYS ON TOP ---------------- */
+document.getElementById("letter").style.zIndex="10";
 
-document.body.appendChild(div);
-setTimeout(()=>div.remove(),18000);
-},2500);
-}
 </script>
+
 
 </body>
 </html>
+
 
 
 
