@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Happy Birthday Cutie</title>
+<title>Happy Birthday Shifa ❤️</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;500&display=swap" rel="stylesheet">
 
@@ -17,29 +17,8 @@ overflow:hidden;
 font-family:'Poppins',sans-serif;
 }
 
-/* Loading Screen */
-#loading{
-position:fixed;
-inset:0;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-background:linear-gradient(135deg,#ff6ec7,#ff9a9e);
-z-index:9999;
-}
-
-#countdown{
-font-size:50px;
-font-weight:bold;
-background:rgba(255,255,255,.25);
-padding:15px 30px;
-border-radius:20px;
-}
-
 /* Title */
 #mainTitle{
-display:none;
 position:fixed;
 top:40px;
 left:50%;
@@ -50,7 +29,7 @@ text-shadow:0 0 25px #ffb6ff;
 z-index:5;
 }
 
-/* Open Letter Button */
+/* Button */
 #openLetterBtn{
 position:fixed;
 top:140px;
@@ -64,7 +43,6 @@ background:linear-gradient(45deg,#ff4fa3,#ff85c8);
 color:white;
 cursor:pointer;
 z-index:6;
-display:none;
 box-shadow:0 0 20px rgba(255,100,170,.7);
 }
 
@@ -105,7 +83,6 @@ justify-content:center;
 align-items:center;
 z-index:9999;
 }
-
 #card{
 background:#fff;
 color:#333;
@@ -113,19 +90,12 @@ max-width:600px;
 padding:30px;
 border-radius:20px;
 line-height:1.7;
-position:relative;
-z-index:10000;
 }
 </style>
 
 </head>
 
 <body>
-
-<div id="loading">
-<h2>Counting moments for you ❤️</h2>
-<div id="countdown">00:00:10</div>
-</div>
 
 <canvas id="fireworks"></canvas>
 
@@ -162,65 +132,11 @@ I LOVE YOU EVER AND FOREVER ❤️
 
 <script>
 
-/* TIME (test 10 sec) */
-let birthday = new Date();
-birthday.setFullYear(2026);
-birthday.setMonth(1);   // February (0 = Jan, 1 = Feb)
-birthday.setDate(19);
-birthday.setHours(0,0,0,0);
-
-
-
-/* COUNTDOWN */
-const cd=document.getElementById("countdown");
-function updateCountdown(){
-let diff=birthday-new Date();
-if(diff<=0){
-clearInterval(countdownTimer);   // STOP countdown
-startExperience();
-return;
-}
-
-let s=Math.floor((diff/1000)%60);
-let m=Math.floor((diff/1000/60)%60);
-let h=Math.floor((diff/1000/60/60)%24);
-cd.textContent=
-String(h).padStart(2,"0")+":"+
-String(m).padStart(2,"0")+":"+
-String(s).padStart(2,"0");
-}
-let countdownTimer = setInterval(updateCountdown,1000);
-updateCountdown();
-
-
-/* START */
-let paused=false;
-let started=false;
-
-let current=null;
-
-function startExperience(){
-if(started) return;
-started = true;
-
-document.getElementById("loading").style.display="none";
-document.getElementById("mainTitle").style.display="block";
-document.getElementById("openLetterBtn").style.display="block";
-launchFireworks();
-startMemories();
-}
-
-/* Button opens letter */
-document.getElementById("openLetterBtn").onclick=function(){
-paused=true;
-document.getElementById("letter").style.display="flex";
-};
-
 /* FIREWORKS */
 const canvas=document.getElementById("fireworks");
 const ctx=canvas.getContext("2d");
-canvas.width=innerWidth;
-canvas.height=innerHeight;
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
 
 let particles=[];
 setInterval(()=>{
@@ -235,7 +151,6 @@ life:100
 }
 },700);
 
-function launchFireworks(){
 (function animate(){
 ctx.fillStyle="rgba(0,0,0,.25)";
 ctx.fillRect(0,0,canvas.width,canvas.height);
@@ -249,23 +164,30 @@ if(p.life<=0)particles.splice(i,1);
 });
 requestAnimationFrame(animate);
 })();
-}
 
-/* FILES */
+/* LETTER BUTTON */
+let paused=false;
+document.getElementById("openLetterBtn").onclick=function(){
+paused=true;
+document.getElementById("letter").style.display="flex";
+};
+
+/* MEMORIES */
 const files=[
 "photos/1.jpg","photos/2.jpg","photos/3.jpg","photos/4.jpg","photos/5.jpg",
 "photos/6.jpg","photos/7.jpg","photos/8.jpg","photos/9.jpg","photos/10.jpg",
 "photos/11.jpg","photos/12.mp4","photos/13.mp4","photos/14.mp4","photos/15.mp4","photos/16.mp4"
 ];
 
-/* MEMORIES */
-function startMemories(){
 let queue=[...files];
 queue.sort(()=>Math.random()-0.5);
+
+let current=null;
 let i=0;
 
-function next(){
+function showMemory(){
 if(paused||i>=queue.length) return;
+
 if(current) current.remove();
 
 let src=queue[i++];
@@ -291,15 +213,12 @@ div.style.top=Math.random()*(window.innerHeight-260)+"px";
 document.body.appendChild(div);
 current=div;
 
-setTimeout(next,7000);
+setTimeout(showMemory,7000);
 }
-next();
-}
+
+showMemory();
 
 </script>
 
 </body>
 </html>
-
-
-
