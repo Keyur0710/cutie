@@ -160,9 +160,10 @@ startPhotos();
 
 /* open letter on tap */
 document.body.addEventListener("click",()=>{
+paused = true;   // STOP memories
 document.getElementById("letter").style.display="flex";
 },{once:true});
-}
+
 
 /* countdown */
 /* ---------------- COUNTDOWN CLOCK ---------------- */
@@ -239,6 +240,7 @@ const files=[
 /* ---------------- ONE-BY-ONE MEMORY SHOW ---------------- */
 function startPhotos(){
 
+let paused = false;
 let queue=[...files];           // copy
 queue.sort(()=>Math.random()-0.5); // shuffle once
 
@@ -246,6 +248,7 @@ let index=0;
 
 function showNext(){
 
+if(paused) return;
 if(index>=queue.length) return; // stop after all shown
 
 let src=queue[index];
@@ -313,6 +316,7 @@ document.getElementById("letter").style.zIndex="10";
 
 </body>
 </html>
+
 
 
 
