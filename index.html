@@ -143,13 +143,28 @@ const title=document.getElementById("mainTitle");
 /* START FUNCTION */
 function start(){
 loading.style.display="none";
-title.style.display="block";
+
+/* show title forcefully */
+const t = document.getElementById("mainTitle");
+t.style.display="block";
+t.style.opacity="1";
+t.style.visibility="visible";
+
+/* center it */
+t.style.position="fixed";
+t.style.top="50px";
+t.style.left="50%";
+t.style.transform="translateX(-50%)";
+
 launchFireworks();
 startPhotos();
+
+/* open letter on tap */
 document.body.addEventListener("click",()=>{
 document.getElementById("letter").style.display="flex";
 },{once:true});
 }
+
 
 /* If opened after midnight → skip countdown */
 if(new Date()>=birthday){
@@ -215,10 +230,73 @@ const files=[
 ];;
 
 function startPhotos(){
-setInterval(()=>{
-let src=files[Math.floor(Math.random()*files.length)];
+
+/* make a copy so originals stay safe */
+let memoryQueue = [...files];
+
+/* shuffle memories once */
+memoryQueue.sort(()=>Math.random()-0.5);
+
+let i = 0;
+
+let show = setInterval(()=>{
+
+if(i >= memoryQueue.length){
+clearInterval(show); // stop after all memories shown
+return;
+}
+
+let src = memoryQueue[i];
+i++;
+
 let div=document.createElement("div");
 div.className="polaroid";
+
+let media;
+
+if(src.endsWith(".mp4")){
+media=document.createElement("video");
+media.src=src;
+media.autoplay=true;
+media.loop=false;
+media.muted=true;
+media.playsInline=true;
+}else{
+media=document.createElement("img");
+media.src=src;
+}
+
+div.appendChild(media);
+
+/* random side positions */
+let margin = 260;
+let side = Math.floor(Math.random()*4);
+
+if(side==0){ // top
+div.style.top="20px";
+div.style.left=Math.random()*(window.innerWidth-margin)+"px";
+}
+else if(side==1){ // bottom
+div.style.top=(window.innerHeight-260)+"px";
+div.style.left=Math.random()*(window.innerWidth-margin)+"px";
+}
+else if(side==2){ // left
+div.style.left="20px";
+div.style.top=Math.random()*(window.innerHeight-margin)+"px";
+}
+else{ // right
+div.style.left=(window.innerWidth-240)+"px";
+div.style.top=Math.random()*(window.innerHeight-margin)+"px";
+}
+
+document.body.appendChild(div);
+
+/* remove after some time */
+setTimeout(()=>div.remove(),20000);
+
+},3500);
+}
+
 
 let media;
 if(src.endsWith(".mp4")){
@@ -244,5 +322,6 @@ setTimeout(()=>div.remove(),18000);
 
 </body>
 </html>
+
 
 
