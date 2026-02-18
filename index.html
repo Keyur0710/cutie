@@ -162,7 +162,13 @@ I LOVE YOU EVER AND FOREVER ❤️
 
 <script>
 
-/* TIME (test 10 sec) */let birthday = new Date("2026-02-19T00:00:00+05:30");
+/* TIME (test 10 sec) */
+let birthday = new Date();
+birthday.setFullYear(2026);
+birthday.setMonth(1);   // February (0 = Jan, 1 = Feb)
+birthday.setDate(19);
+birthday.setHours(0,0,0,0);
+
 
 
 /* COUNTDOWN */
@@ -283,4 +289,5 @@ next();
 
 </body>
 </html>
+
 
