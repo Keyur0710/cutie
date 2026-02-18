@@ -165,17 +165,31 @@ document.getElementById("letter").style.display="flex";
 }
 
 /* countdown */
-if(new Date()>=birthday){
-start();
-}else{
+/* ---------------- COUNTDOWN CLOCK ---------------- */
 const cd=document.getElementById("countdown");
-setInterval(()=>{
-let diff=birthday-new Date();
-if(diff<=0){start();return;}
-let s=Math.floor((diff/1000)%60);
-cd.textContent="00:00:"+String(s).padStart(2,"0");
-},1000);
+
+function updateCountdown(){
+let now=new Date().getTime();
+let diff=birthday-now;
+
+if(diff<=0){
+start();
+return;
 }
+
+let hours=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
+let minutes=Math.floor((diff%(1000*60*60))/(1000*60));
+let seconds=Math.floor((diff%(1000*60))/(1000));
+
+cd.textContent=
+String(hours).padStart(2,"0")+":"+
+String(minutes).padStart(2,"0")+":"+
+String(seconds).padStart(2,"0");
+}
+
+setInterval(updateCountdown,1000);
+updateCountdown();
+
 
 /* ---------------- FIREWORKS ---------------- */
 const canvas=document.getElementById("fireworks");
@@ -299,6 +313,7 @@ document.getElementById("letter").style.zIndex="10";
 
 </body>
 </html>
+
 
 
 
