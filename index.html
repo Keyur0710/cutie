@@ -3,7 +3,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Happy Birthday ❤️</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
@@ -50,12 +50,15 @@ cursor:pointer;
 #letter{
 position:fixed;
 inset:0;
-background:rgba(0,0,0,.75);
+background:rgba(0,0,0,.55);
+backdrop-filter: blur(6px);
 display:none;
 justify-content:center;
 align-items:center;
 z-index:9999;
+pointer-events:auto;
 }
+
 #card{
 background:white;
 color:#333;
@@ -90,6 +93,33 @@ top:0;
 left:0;
 pointer-events:none;
 }
+@media (max-width:600px){
+
+#title{
+font-size:34px;
+top:20px;
+}
+
+#btn{
+top:90px;
+padding:12px 22px;
+font-size:15px;
+}
+
+.polaroid{
+width:150px;
+}
+
+.polaroid img,.polaroid video{
+height:120px;
+}
+
+#card{
+margin:20px;
+max-width:90%;
+font-size:15px;
+}
+}
 </style>
 
 </head>
@@ -105,11 +135,13 @@ pointer-events:none;
 <div id="card">
 <h2 style="text-align:center;">HAPPIEST BIRTHDAY SHIFA ❤️</h2>
 
-<p>On Feb 19, 2007 the earth got gifted a very special person… and it's you.</p>
+<p>HHAAPPPIIIESSSTTT BIRRTHHDAAY SHIFA ❤️, On Feb 19 2007 earth got gifted a very special person and it's you.
+    My dearest Shifa,Happy 19th birthday,my love! Today I want to express how truly grateful I am to have you in my life.From the moment we met,you have captivated my heart with your beautiful laughter,kind heart,and beautiful soul.Everyday with you feels like a celebration,but on this special day,I want to shower you with all the love and affection you deserve.You bring so much joy and happiness into my life,and I am forever grateful for the love and happiness you have brought into my small world.May this birthday be the beginning of the year filled with endless love, laughter,and unforgettable memories, Happy Birthday, Cutie! 
+    </p>
 
-<p>My dearest Shifa, Happy 19th birthday my love! You make my life brighter and happier. Your smile, your kindness and your presence mean everything to me.</p>
+<!-- <p>My dearest Shifa, Happy 19th birthday my love! You make my life brighter and happier. Your smile, your kindness and your presence mean everything to me.</p> -->
 
-<p style="text-align:center;font-size:20px;"><b>I LOVE YOU FOREVER ❤️</b></p>
+<p style="text-align:center;font-size:20px;"><b>I LOVE YOU FOREVER ❤️🫶💋</b></p>
 
 <p style="text-align:right;">— Yours, Oldiee 💋</p>
 
@@ -121,7 +153,7 @@ pointer-events:none;
 <script>
 
 /* open letter */
-let paused=false;
+//let paused=false;
 document.getElementById("btn").onclick=function(){
 paused=true;
 document.getElementById("letter").style.display="flex";
@@ -135,7 +167,7 @@ c.height=innerHeight;
 
 let p=[];
 setInterval(()=>{
-for(let i=0;i<50;i++){
+    for(let i=0;i<18;i++){
 p.push({x:Math.random()*c.width,y:Math.random()*c.height/2,dx:(Math.random()-.5)*5,dy:(Math.random()-.5)*5,l:100});
 }
 },700);
@@ -161,41 +193,89 @@ const files=[
 "photos/11.jpg","photos/12.mp4","photos/13.mp4","photos/14.mp4","photos/15.mp4","photos/16.mp4"
 ];
 
-let i=0,current=null;
+/* ULTRA SMOOTH SLIDESHOW */
+/* PRELOAD ALL MEDIA */
+const preloaded = [];
+
+files.forEach(src=>{
+    if(src.endsWith(".mp4")){
+        const v=document.createElement("video");
+        v.src=src;
+        v.preload="auto";
+        v.muted=true;
+        v.playsInline=true;
+        preloaded.push(v);
+    }else{
+        const img=new Image();
+        img.src=src;
+        img.decoding="async";
+        img.loading="eager";
+        preloaded.push(img);
+    }
+});
+
+let index=0;
 
 function show(){
-if(paused||i>=files.length)return;
 
-if(current)current.remove();
+    if(index>=files.length) index=0;
 
-let d=document.createElement("div");
-d.className="polaroid";
+    const src = files[index++];
+    let d=document.createElement("div");
+    d.className="polaroid";
 
-let src=files[i++];
-let m;
+    let media;
 
-if(src.endsWith(".mp4")){
-m=document.createElement("video");
-m.src=src;
-m.autoplay=true;
-m.muted=true;
-}else{
-m=document.createElement("img");
-m.src=src;
+    if(src.endsWith(".mp4")){
+        media=document.createElement("video");
+        media.src=src;
+        media.autoplay=true;
+        media.loop=true;
+        media.muted=true;
+        media.playsInline=true;
+        media.setAttribute("webkit-playsinline","");
+        media.preload="auto";
+    }else{
+        media=document.createElement("img");
+        media.src=src;
+        media.decoding="async";
+        media.loading="eager";
+    }
+
+    /* instant fade-in */
+    d.style.opacity="0";
+    d.style.transition="opacity .6s ease";
+
+    d.appendChild(media);
+
+    d.style.left=Math.random()*(window.innerWidth-260)+"px";
+    d.style.top=Math.random()*(window.innerHeight-260)+"px";
+
+    document.body.appendChild(d);
+
+    requestAnimationFrame(()=>{
+        d.style.opacity="1";
+    });
+
+    /* remove after some time */
+    setTimeout(()=>{
+        d.style.opacity="0";
+        setTimeout(()=>d.remove(),600);
+    },9000);
+
+    /* NEXT PHOTO SPEED (HERE IS THE MAIN SPEED CONTROL) */
+    setTimeout(show,2000);  // ← NOW 2 seconds per photo
 }
 
-d.appendChild(m);
-d.style.left=Math.random()*(window.innerWidth-260)+"px";
-d.style.top=Math.random()*(window.innerHeight-260)+"px";
-
-document.body.appendChild(d);
-current=d;
-
-setTimeout(show,7000);
-}
 show();
 
+document.getElementById("letter").addEventListener("click",function(e){
+if(e.target.id==="letter"){
+this.style.display="none";
+}
+});
 </script>
 
 </body>
 </html>
+
